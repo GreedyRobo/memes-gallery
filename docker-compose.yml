@@ -1,0 +1,36 @@
+version: '3.3'
+
+services:
+    db:
+         image: mysql:8.0
+         volumes:
+           - db_data:/var/lib/mysql
+         environment:
+           - MYSQL_RANDOM_ROOT_PASSWORD=yes
+           - MYSQL_DATABASE=${WORDPRESS_DB_NAME}
+           - MYSQL_PASSWORD=${WORDPRESS_DB_PASSWORD}
+           - MYSQL_USER=${WORDPRESS_DB_USER}
+          
+    wordpress:
+        build:
+            context: ./api
+        env_file:
+          - ./api/.env
+        volumes:
+            - ./api/wordpress:/var/www/html
+            - ./api/wp-content:/var/www/html/wp-content
+        ports:
+            - "8080:80"               
+      
+    client:
+        build:
+            context: ./client
+        env_file:
+          - ./client/.env
+        volumes:
+          - ./client:/var/www/html
+        ports:
+          - "3000:3000"
+        stdin_open: true
+volumes:
+    db_data: {}
